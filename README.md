@@ -1,4 +1,11 @@
-# Looker Extension Template (React & TypeScript)
+# Pollooker
+## An application for tracking the 2020 Democratic Primary in Looker.
+
+More details about this project will be added as they are available. The goal of this project is to develop a robust data application for exploring time-series public opinion polling such as presidential approval ratings, customer feedback, and primary preferences.
+
+
+## copy of original README for reference
+## Looker Extension Template (React & TypeScript)
 
 This repository serves as a template for creating a new Looker Extension.
 
