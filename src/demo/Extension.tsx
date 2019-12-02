@@ -192,7 +192,7 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
       <>
         {this.state.errorMessage && <Banner intent='error'>{this.state.errorMessage}</Banner>}
         <Box m='large'>
-          <Heading fontWeight='semiBold'>Welcome to the Looker Extension Template</Heading>
+          <Heading fontWeight='semiBold'>Tracking the 2020 Democratic Primary in Looker.</Heading>
           <Flex width='100%'>
             <LookList
               loading={this.state.loadingLooks}
