@@ -7,7 +7,7 @@
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * copies of the Software, and to permit persons to whom the  is
  * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
@@ -23,22 +23,20 @@
  */
 
 import React from 'react'
+import {QueryContainer} from './QueryContainer';
 import {LookList} from './LookList'
-import {QueryContainer} from './QueryContainer'
 import {Banner, Box, Heading, Flex} from '@looker/components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import {ILook} from '@looker/sdk'
 import {Switch, Route, RouteComponentProps, withRouter, MemoryRouter} from 'react-router-dom'
+import ReactDOM from 'react-dom'
 
 interface ExtensionState {
-  looks?: ILook[]
-  currentLook?: ILook
-  selectedLookId?: number
   queryResult?: any
   runningQuery: boolean
-  loadingLooks: boolean
   errorMessage?: string
 }
+
 
 class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionState> {
   static contextType = ExtensionContext
@@ -47,12 +45,8 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
   constructor(props: RouteComponentProps) {
     super(props)
     this.state = {
-      looks: undefined,
-      selectedLookId: undefined,
-      currentLook: undefined,
       queryResult: undefined,
-      runningQuery: false,
-      loadingLooks: false
+      runningQuery: false
     }
   }
 
@@ -61,15 +55,7 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
     if (initializeError) {
       return
     }
-    const {location} = this.props
-    const path: string[] = location.pathname.split('/')
-    if (path.length > 1 && path[1] !== '') {
-      const id: number = parseInt(path[1], 10)
-      if (!isNaN(id)) {
-        this.setState({selectedLookId: id})
-      }
-    }
-    this.loadLooks()
+    this.runQuery()
   }
 
   componentDidUpdate() {
@@ -77,34 +63,22 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
     if (initializeError) {
       return
     }
-    const {looks, selectedLookId, currentLook, runningQuery} = this.state
-    if (looks) {
-      if (!selectedLookId) {
-        if (looks.length > 0) {
-          this.onLookSelected(looks[0])
-        }
-      } else {
-        if (!runningQuery && !currentLook) {
-          this.runLook(selectedLookId)
-        }
-      }
-    }
   }
 
-  /*
-  // TEMPLATE CODE FOR RUNNING ANY QUERY
+  // TEMPLATE CODE FOR RUNNING ANY QUERY 
   async runQuery() {
       try {
       const result = await this.context.coreSDK.ok(
         this.context.coreSDK.run_inline_query({
           result_format: "json_detail",
-          limit: 10,
+          //limit: 50,
           body: {
-            total: true,
-            model: "thelook",
-            view: "users",
-            fields: ["last_name", "gender"],
-            sorts: [`last_name desc`]
+            model: "pollooker",
+            view: "primary",
+            fields: ["primary.start_date_date", "primary.end_date_date",  "primary.pollster",  "primary.state",  "primary.fte_grade",  "primary.pool", "primary.biden_polling_pct", "primary.warren_polling_pct", "primary.sanders_polling_pct", "primary.buttigieg_polling_pct", "primary.harris_polling_pct", "primary.steyer_polling_pct", "primary.bloomberg_polling_pct", "primary.klobuchar_polling_pct", "primary.yang_polling_pct", "primary.gabbard_polling_pct", "primary.booker_polling_pct"],
+            //filter_expression: "${primary.party} = \"DEM\" AND ${primary.state} = \"Iowa\" OR ${primary.state} = \"South Carolina\" OR ${primary.state} = \"New Hampshire\" OR ${primary.state} = \"Nevada\"",
+            filter_expression: "${primary.party} = \"DEM\" AND ${primary.state} = \"\"",
+            sorts: [`start_date_date desc`]
           }
         })
       )
@@ -119,69 +93,6 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
         errorMessage: "Unable to run query"
       })
     }
-
-  */
-
-  async runLook(look_id: number) {
-    const look = (this.state.looks || []).find((l) => l.id == look_id)
-    // If no matching Look then return
-    if (look === undefined) {
-      this.setState({
-        selectedLookId: undefined,
-        currentLook: undefined,
-        errorMessage: 'Unable to load Look.',
-        queryResult: '',
-        runningQuery: false
-      })
-      return
-    }
-
-    // Set Page title
-    this.context.extensionSDK.updateTitle(`Look: ${look.title || 'unknown'}`)
-
-    this.setState({currentLook: look, runningQuery: true, errorMessage: undefined})
-
-    try {
-      const result = await this.context.coreSDK.ok(
-        this.context.coreSDK.run_look({look_id: look_id, result_format: 'json'})
-      )
-      this.setState({
-        queryResult: result,
-        runningQuery: false
-      })
-    } catch (error) {
-      this.setState({
-        queryResult: '',
-        runningQuery: false,
-        errorMessage: 'Unable to run look'
-      })
-    }
-  }
-
-  async loadLooks() {
-    this.setState({loadingLooks: true, errorMessage: undefined})
-    try {
-      const result = await this.context.coreSDK.ok(this.context.coreSDK.all_looks())
-      this.setState({
-        // Take up to the first 10 looks
-        looks: result.slice(0, 9),
-        loadingLooks: false
-      })
-    } catch (error) {
-      this.setState({
-        looks: [],
-        loadingLooks: false,
-        errorMessage: 'Error loading looks'
-      })
-    }
-  }
-
-  onLookSelected(look: ILook) {
-    this.props.history.push('/' + look.id)
-    if (look.id !== this.state.selectedLookId) {
-      this.setState({selectedLookId: look.id})
-      this.runLook(look.id!)
-    }
   }
 
   render() {
@@ -191,18 +102,13 @@ class ExtensionInternal extends React.Component<RouteComponentProps, ExtensionSt
     return (
       <>
         {this.state.errorMessage && <Banner intent='error'>{this.state.errorMessage}</Banner>}
-        <Box m='large'>
-          <Heading fontWeight='semiBold'>Tracking the 2020 Democratic Primary in Looker.</Heading>
+        <Box m='large' id='boxID'>
+          <Heading fontWeight='semiBold'>Pollooker</Heading>
+          <Heading fontWeight='light'>Tracking the 2020 Democratic Primary</Heading>
           <Flex width='100%'>
-            <LookList
-              loading={this.state.loadingLooks}
-              looks={this.state.looks || []}
-              selectLook={(look: ILook) => this.onLookSelected(look)}
-            />
             <Switch>
-              <Route path='/:id'>
+              <Route path='/app'>
                 <QueryContainer
-                  look={this.state.currentLook}
                   results={this.state.queryResult}
                   running={this.state.runningQuery}
                 />
