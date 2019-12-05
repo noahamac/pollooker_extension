@@ -3,7 +3,7 @@
 
 More details about this project will be added as they are available. The goal of this project is to develop a robust data application for exploring time-series public opinion polling such as presidential approval ratings, customer feedback, and primary preferences.
 
-!(Hackday update)[https://github.com/noahamac/pollooker_extension/blob/master/Screen%20Shot%202019-12-04%20at%202.59.16%20PM.png?raw=true]
+<img src="https://github.com/noahamac/pollooker_extension/blob/master/Screen%20Shot%202019-12-04%20at%202.59.16%20PM.png?raw=true">
 
 
 ## copy of original README for reference
