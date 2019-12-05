@@ -3,6 +3,8 @@
 
 More details about this project will be added as they are available. The goal of this project is to develop a robust data application for exploring time-series public opinion polling such as presidential approval ratings, customer feedback, and primary preferences.
 
+!(Hackday update)[Screen Shot 2019-12-04 at 2.59.16 PM.png]
+
 
 ## copy of original README for reference
 ## Looker Extension Template (React & TypeScript)
